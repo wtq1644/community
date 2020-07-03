@@ -1,9 +1,11 @@
-package com.nowcoder.communtity.service;
+package com.nowcoder.community.service;
 
-import com.nowcoder.communtity.dao.UserMapper;
-import com.nowcoder.communtity.entity.User;
-import com.nowcoder.communtity.util.CommunityUtil;
-import com.nowcoder.communtity.util.MailClient;
+import com.nowcoder.community.dao.LoginTicketMapper;
+import com.nowcoder.community.dao.UserMapper;
+import com.nowcoder.community.entity.LoginTicket;
+import com.nowcoder.community.entity.User;
+import com.nowcoder.community.util.CommunityUtil;
+import com.nowcoder.community.util.MailClient;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import static com.nowcoder.communtity.util.CommunityConstant.*;
+import static com.nowcoder.community.util.CommunityConstant.*;
 
 @Service
 public class UserService {
@@ -36,6 +38,9 @@ public class UserService {
     @Value("${server.servlet.context-path}")
     private String contextPath;
 
+    @Autowired
+    private LoginTicketMapper loginTicketMapper;
+
     public User findUserById(int id) {
 
         return userMapper.selectById(id);
@@ -49,15 +54,15 @@ public class UserService {
             throw new IllegalArgumentException("参数不能为空！");
         }
         if (StringUtils.isBlank(user.getUsername())) {
-            map.put("usernameMsg","账号不能为空！");
+            map.put("usernameMsg", "账号不能为空！");
             return map;
         }
         if (StringUtils.isBlank(user.getPassword())) {
-            map.put("passwordMsg","密码不能为空！");
+            map.put("passwordMsg", "密码不能为空！");
             return map;
         }
         if (StringUtils.isBlank(user.getEmail())) {
-            map.put("emailMsg","邮箱不能为空！");
+            map.put("emailMsg", "邮箱不能为空！");
             return map;
         }
 
@@ -108,6 +113,55 @@ public class UserService {
         } else {
             return ACTIVATION_FAILURE;
         }
+    }
+
+    public Map<String, Object> login(String username, String password, int expiredSeconds) {
+        Map<String, Object> map = new HashMap<>();
+
+        //空值处理
+
+
+        if (StringUtils.isBlank(username)) {
+            map.put("usernameMsg","账号不能为空");
+            return map;
+        }
+        if (StringUtils.isBlank(password)) {
+            map.put("passwordMsg","密码不能为空");
+            return map;
+        }
+
+        // 验证账号
+        User user = userMapper.selectByName(username);
+        if (user == null) {
+            map.put("usernameMsg", "该账号不存在!");
+            return map;
+        }
+
+        // 验证状态
+        if (user.getStatus() == 0) {
+            map.put("usernameMsg", "该账号未激活!");
+            return map;
+        }
+
+        // 验证密码
+        password = CommunityUtil.md5(password + user.getSalt());
+        if (!user.getPassword().equals(password)) {
+            map.put("passwordMsg", "密码不正确!");
+            return map;
+        }
+        // 生成登录凭证
+        LoginTicket loginTicket = new LoginTicket();
+        loginTicket.setUserId(user.getId());
+        loginTicket.setTicket(CommunityUtil.generateUUID());
+        loginTicket.setStatus(0);
+        loginTicket.setExpired(new Date(System.currentTimeMillis() + expiredSeconds * 1000));
+        loginTicketMapper.insertLoginTicket(loginTicket);
+
+        map.put("ticket", loginTicket.getTicket());
+        return map;
+    }
+    public void logout(String ticket) {
+        loginTicketMapper.updateStatus(ticket, 1);
     }
 
 }

@@ -8,10 +8,10 @@
         <version>2.3.1.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.nowcoder.communtity</groupId>
-    <artifactId>communtity</artifactId>
+    <groupId>com.nowcoder.community</groupId>
+    <artifactId>community</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>communtity</name>
+    <name>community</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>

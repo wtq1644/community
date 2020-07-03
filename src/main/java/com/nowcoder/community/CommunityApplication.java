@@ -1,13 +1,13 @@
-package com.nowcoder.communtity;
+package com.nowcoder.community;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class CommuntityApplication {
+public class CommunityApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(CommuntityApplication.class, args);
+        SpringApplication.run(CommunityApplication.class, args);
     }
 
 }

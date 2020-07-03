@@ -1,4 +1,4 @@
-package com.nowcoder.communtity.util;
+package com.nowcoder.community.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.DigestUtils;

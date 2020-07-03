@@ -1,10 +1,10 @@
-package com.nowcoder.communtity;
+package com.nowcoder.community;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class CommuntityApplicationTests {
+class CommunityApplicationTests {
 
     @Test
     void contextLoads() {
